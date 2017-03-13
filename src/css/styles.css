@@ -1,0 +1,60 @@
+.header{
+    color: black;
+    background: #ccc;
+    height:60px;
+    border-radius: 10px 10px 0 0;
+    padding: 1.5%;
+}
+
+.vneseni{
+    height: 100%;
+    width: 40%;
+    background: #dff0d8;
+    border-radius: 50% 50% 50% 50%;
+}
+
+.ne_vneseni{
+    height: 100%;
+    width: 40%;
+    background: #f2dede;
+    border-radius: 50% 50% 50% 50%;
+}
+
+.numbers a{
+    color: darkblue;
+    font-size: 12pt;
+    margin: 30%;
+}
+
+.btn-mine{
+    margin:1%;
+}
+
+.search-block{
+    margin: 2%;
+    padding:3%;
+    outline: 1px solid grey;
+}
+
+.rassmotrenie{
+    height: 100%;
+    width: 40%;
+    background: #fcf8e3;
+    border-radius: 50% 50% 50% 50%;
+}
+
+.ul.hr {
+    margin: 0; /* Обнуляем значение отступов */
+    padding: 4px; /* Значение полей */
+}
+
+.ul.hr li {
+    display: inline; /* Отображать как строчный элемент */
+    margin-right: 5px; /* Отступ слева */
+    padding: 3px; /* Поля вокруг текста */
+}
+
+.hid{
+    display: none;
+}
+
