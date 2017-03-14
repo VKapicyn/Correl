@@ -1,3 +1,4 @@
+var historyModel = require('../models/db-model').historyModel;
 var fs = require('fs');
 
 exports.mainPage = function (req, res){
@@ -20,4 +21,14 @@ exports.setConfig = function (req, res){
     catch(e){
         console.log(e); res.send('Неверные входне данные');
     }
+}
+
+exports.resultJson = function (req, res){
+    historyModel.findOne().then(function(result){
+        if (req.params.sort != 'all'){
+            //реализуем сортировки
+        }
+        else
+            res.json(result.history);
+    });
 }

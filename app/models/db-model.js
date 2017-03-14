@@ -25,26 +25,21 @@ module.exports.url = url;
 
 
 exports.updateHistory = function(){
-    let start = '2016-09-01';
-    let finish = '2017-04-10';
-
-    //не работает потому что асинхронно, переделать на промис
-    let historyData = require('./historyDataModel').getHistory(start, finish);
-    
-    historyModel.find().remove().then(function(result){
-        let new_history = new historyModel;
-        for(let i=0; i<historyData.length; i++){
-            let obj = {};
-            obj.ftn = historyData[i].ftn;
-            obj.stn = historyData[i].stn;
-            obj.kf = historyData[i].kf;
-            new_history.history.push(obj);
-        }
-        new_history.update = new Date();
-        new_history.save();
-    }).then(function(){
-        require('/app/models/monitroingModel').monitoring();
-    });
+    require('./historyDataModel').getHistory
+    .then(function(historyData, err){
+        historyModel.find().remove().then(function(result){
+            let new_history = new historyModel;
+            for(let i=0; i<historyData.length; i++){
+                let obj = {};
+                obj.ftn = historyData[i].ftn;
+                obj.stn = historyData[i].stn;
+                obj.kf = historyData[i].kf;
+                new_history.history.push(obj);
+            }
+            new_history.update = new Date();
+            new_history.save();
+        });
+    });    
 }
 
 

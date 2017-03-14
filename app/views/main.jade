@@ -10,6 +10,7 @@ html
         link(href='/css/styles.css' rel="stylesheet" type="text/css")
 
         //JS
+        script(src='/js/jquery-3.1.1.min.js')
         script(src="//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js")
         title
             | general
@@ -17,7 +18,16 @@ html
         .container
             .row
                 .col-md-9
-                    | 123 #{data}
+                    table.table
+                        thead.thead-inverse
+                        tr
+                            th #
+                            th 
+                                | Коэфф.
+                            th Тикер #1
+                            th Тикер #2
+                        tbody(id='sTable')
+                                        tr
                 .col-md-3
                     form(method='post', action='/result')
                         input(type='text', name='kf', placeholder='Коэффициент')
@@ -25,11 +35,7 @@ html
                         input(type='text', name='period', placeholder='Период в месяцах') 
                         |  Период 
                         br
-                        select(name='time')
-                            option День
-                            option Неделя
-                            option Месяц
-                        |  Тайм фрейм 
+                        input(type='text', name='procent', placeholder='Процент') 
                         br
                         select(name='price')
                             option Закрытие
@@ -39,3 +45,4 @@ html
                         textarea(name='tickers', rows='5', cols='15', placeholder='список тикеров')
                         br
                         button(type='input') Отправить
+    script(src='/js/front.js')

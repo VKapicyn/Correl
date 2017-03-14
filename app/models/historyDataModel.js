@@ -2,16 +2,19 @@ var fs = require('fs');
 var YahooFinanceAPI = require('yahoo-finance-data');
 var api = new YahooFinanceAPI();
 
-//!!!! Переделать как промис
 //выгружает историю с yahoo finance
-exports.getHistory = function (start, stop){
-    let config = require('./historyDataModel').getConfig();
+exports.getHistory = new Promise((resolve, reject) => {
+    let config = JSON.parse(fs.readFileSync('src/dataConfig.json', 'utf8'));
     let tickers = config.tickers;
     let tickersMass = config.tickers.split(';');
     let allData = [];
-    
+    let start = getNowDate();//'2016-09-01';//получение начальной даты
+    console.log(start);
+    let finish = getEndDate();//'2017-04-10';//получение конечной даты
+    console.log(finish);
+
     function recur(tickersMass, i){
-        api.getHistoricalData(tickersMass[i], start, stop)//'2016-09-01', '2017-04-10')
+        api.getHistoricalData(tickersMass[i], start, finish)
         .then(function(result) {
             allData.push(result.data);
             return i;
@@ -22,13 +25,12 @@ exports.getHistory = function (start, stop){
             }
             else
                 {
-                    return sochet(allData, allData.length);
+                    resolve(sochet(allData, allData.length));
                 }
         });
     }
-
     recur(tickersMass, 0);
-};
+});
 
 //вызывает рассчет корреляции для всех сочетаний
 function sochet(data, length){
@@ -50,18 +52,32 @@ function correl(one, two){
     {
         for (let i=0; (i<counts); i++)
         {
-            x = Number(x) + Number(one[i].Close);
-            y = Number(y) + Number(two[i].Close);
-            xy = Number(xy) + Number(one[i].Close)*Number(two[i].Close);
-            xx = Number(xx) + Number(one[i].Close)*Number(one[i].Close);
-            yy = Number(yy) + Number(two[i].Close)*Number(two[i].Close);
+            if (JSON.parse(fs.readFileSync('src/dataConfig.json', 'utf8')).price=='Медиана')
+            {
+                x = Number(x) + Number(one[i].Close);
+                y = Number(y) + Number(two[i].Close);
+                xy = Number(xy) + Number(one[i].Close)*Number(two[i].Close);
+                xx = Number(xx) + Number(one[i].Close)*Number(one[i].Close);
+                yy = Number(yy) + Number(two[i].Close)*Number(two[i].Close);
+            }
+            else{
+                x = Number(x) + ((Number(one[i].High) - Number(one[i].Low))/2 + Number(one[i].Low));
+                y = Number(y) + ((Number(two[i].High) - Number(two[i].Low))/2 + + Number(two[i].Low));
+                xy = Number(xy) + ((Number(one[i].High) - Number(one[i].Low))/2 + Number(one[i].Low))*((Number(two[i].High) - Number(two[i].Low))/2 + + Number(two[i].Low));
+                xx = Number(xx) + ((Number(one[i].High) - Number(one[i].Low))/2 + Number(one[i].Low))*((Number(one[i].High) - Number(one[i].Low))/2 + Number(one[i].Low));
+                yy = Number(yy) + ((Number(two[i].High) - Number(two[i].Low))/2 + + Number(two[i].Low))*((Number(two[i].High) - Number(two[i].Low))/2 + + Number(two[i].Low));
+            }
         }
     }
     let kf = (xy * counts - x * y) / Math.sqrt((xx * counts - x * x) * ((yy * counts - y * y)));
+    let obj = {};
+    obj.ftn = one[0].Symbol;
+    obj.stn = two[0].Symbol;
+    obj.kf = kf;
     //console.log(one[0].Symbol+' '+two[0].Symbol+' '+ kf);
     //console.log('--------');
 
-    return kf;
+    return obj;
 }
 
 //загрузка конфига
@@ -69,3 +85,24 @@ exports.getConfig = function(){
     let config = JSON.parse(fs.readFileSync('src/dataConfig.json', 'utf8'));
     return config;
 }
+
+function getNowDate(){
+	var date = new Date();
+	var month = date.getMonth()>=10?date.getMonth():'0'+date.getMonth();
+	var day = date.getDate()>=10?date.getDate():'0'+date.getdate();
+	return (date.getFullYear()+'-'+month+'-'+day);
+};
+
+//доделать логику в зависимости от конфигурации	
+function getEndDate(){
+	var date = new Date();
+	var month;
+	if (date.getMonth()>=9){
+		month=date.getMonth()+1;
+		month=date.getMonth()==13?'01':month;
+	}
+	else
+		month='0'+(date.getMonth()+1);
+	var day = date.getDate()>=10?date.getDate():'0'+date.getdate();
+	return (date.getFullYear()+'-'+month+'-'+day);
+};
