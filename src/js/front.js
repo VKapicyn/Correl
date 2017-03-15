@@ -1,10 +1,11 @@
+var sort = 'all';
 getSearch();
 
 function getSearch(){
     $('.output').remove();
-    console.log('zashel')
     let j = 0;
-    $.getJSON('/monitoring', function(data){
+    $.getJSON('/monitoring/' + sort, function(data){
+        
         for(let i in data){
 
             let tableContent = '';
@@ -22,4 +23,12 @@ function getSearch(){
 
     });
     
+}
+
+function toSort(){
+    if (sort == '-1')
+        sort = '1';
+    else
+        sort = '-1';
+    getSearch();
 }

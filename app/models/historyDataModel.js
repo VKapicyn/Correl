@@ -8,15 +8,16 @@ exports.getHistory = new Promise((resolve, reject) => {
     let tickers = config.tickers;
     let tickersMass = config.tickers.split(';');
     let allData = [];
-    let start = getNowDate();//'2016-09-01';//получение начальной даты
+    let start = getStartDate();//получение начальной даты
     console.log(start);
-    let finish = getEndDate();//'2017-04-10';//получение конечной даты
-    console.log(finish);
+    let finish = getEndDate();//получение конечной даты
+    //console.log(finish);
 
     function recur(tickersMass, i){
         api.getHistoricalData(tickersMass[i], start, finish)
         .then(function(result) {
             allData.push(result.data);
+            console.log(i);
             return i;
         }).done(function(i){
             if(i<tickersMass.length-1){
@@ -86,14 +87,20 @@ exports.getConfig = function(){
     return config;
 }
 
-function getNowDate(){
-	var date = new Date();
-	var month = date.getMonth()>=10?date.getMonth():'0'+date.getMonth();
+function getStartDate(){
+    var period = JSON.parse(fs.readFileSync('src/dataConfig.json', 'utf8')).period;
+	var date = new Date();console.log(date), console.log(date.getMonth())
 	var day = date.getDate()>=10?date.getDate():'0'+date.getdate();
-	return (date.getFullYear()+'-'+month+'-'+day);
+    var year = date.getFullYear();
+    var month = date.getMonth() - Number(period) + 1;
+    if (month<0) {
+        month = Number(12) + Number(month); 
+        year = year - 1
+    }
+    month = (month<10) ? '0'+month : month;
+	return (year+'-'+month+'-'+day);
 };
 
-//доделать логику в зависимости от конфигурации	
 function getEndDate(){
 	var date = new Date();
 	var month;
