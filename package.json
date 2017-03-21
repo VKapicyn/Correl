@@ -28,6 +28,7 @@
     "mongoose": "^4.6.7",
     "multer": "^1.2.1",
     "nodemon": "^1.11.0",
+    "request": "^2.81.0",
     "yahoo-finance-data": "^1.0.1",
     "yahoo-nasdaq": "^1.0.0"
   }

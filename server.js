@@ -39,9 +39,10 @@ app.set('view engine', 'jade');
 app.get('/', require('./app/controllers/main').mainPage);
 app.get('/select', require('./app/controllers/portfel').selection);
 app.get('/monitoring/:sort', require('./app/controllers/main').resultJson)
+app.get('/settings', require('./app/controllers/portfel').settings);
+app.get('/update', require('./app/controllers/portfel').update);
 app.post('/result', require('./app/controllers/main').setConfig);
 app.post('/email', require('./app/controllers/main').setEmail);
-
 
 app.listen(require('./app/config.js').port);
 console.log('Сервер работает');                                                                                                                                                              

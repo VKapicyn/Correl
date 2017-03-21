@@ -1,0 +1,20 @@
+html
+    head
+        title
+            | Настройки
+    body
+        .container
+            .row
+                .col-md-9
+                    h3
+                        | Последнее обновление: #{lastUpdate}
+                    h3
+                        | Число доступных акций: #{count}
+                    h3
+                        | Последний портфель отобран: #{date}
+                    a(href='/update')
+                        button Обновить
+                    a(href='/select')
+                        button Отобрать акции
+                    a(href='/show')
+                        button Показать портфель
