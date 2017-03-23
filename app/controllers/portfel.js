@@ -1,9 +1,10 @@
 let Stock = require('../models/stock').stock;
 let Sector = require('../models/sector').sector;
+let tickerModel = require('../models/sector').tickersModel;
 let historyMonth = require('../models/stock').historyMonth;
+var sectors_name = require('../models/sector').getSectors();
 
 exports.selection = function(req, res){
-    let sectors_name = require('../models/sector').getSectors();
     let sectors = [];
     sectors_name.map(sector_name => sectors.push(new Sector(sector_name))) 
     //проход по секторам
@@ -55,14 +56,29 @@ exports.selection = function(req, res){
 }
 
 exports.settings = function(req, res){
-    historyMonth.find().then(function(result){
+    historyMonth.findOne().then(function(result){
         //console.log(result);
-        if (result.length!=0)
-        {
-            res.render('settings', {
-                lastUpdate: result[result.length-1].history[0].Date,
-                count: result.length
+        if (result.tickers.length!=0)
+        {   
+            let count_promise = new Promise((resolve, reject) => {
+                var all_count = 0;
+                tickerModel.find().then(function(data){
+                    for(let i=0; i<data.length; i++){
+                        all_count = all_count + data[i].tickers.length;
+                    }
+                    resolve(all_count);
+                })
             });
+            count_promise.then(function(reslt, err){
+                res.render('settings', {
+                lastUpdate: result.update,
+                count: result.good,
+                bad: result.bad,
+                procent: (result.good / reslt * 100).toFixed(2),
+                updated: ((result.good + result.bad) / reslt * 100).toFixed(2)
+                });
+            });
+
         }
         else
         {
@@ -74,30 +90,64 @@ exports.settings = function(req, res){
     })
 }
 
+//Работает. НЕ ТРОГТЬ!!!
 exports.update = function(req, res){
     let sectors_name = require('../models/sector').getSectors();
     let sectors = [];
+    historyMonth.findOne().then(function(tick){
+        tick.tickers = [];
+        tick.good = 0;
+        tick.bad = 0;
+        tick.save();
+    });
+
     sectors_name.map(sector_name => sectors.push(new Sector(sector_name)));
-    sectors.map(sector => {
+
+    recurs2(0);
+
+    function recurs2(j){
         let stocks = [];
-        sector.getTickers().then(function(tickers, err){
-            let ok_stocks = [];
+        sectors[j].getTickers().then(function(tickers, err){
             tickers.map(ticker => {
                 stocks.push(new Stock(ticker));
-            });
-            var error = 0, complete = 0;
-            stocks.map(stock => {
-                    stock.setHistory(stock.getTicker()).then(function(result, err){
-                        if (result)
-                            complete++;
-                        if (error)
-                            error++;
-                    });
+            })
+            return stocks;
+        }).then(function(_stocks){;
+            if(j<sectors.length-1){
+                upakovka(_stocks,j,sectors[j]);
+            }
+        });
+    }
+
+    function upakovka(stocks, j, sector){
+        let historyPromise = new Promise((resolve, reject) => {
+            function recurs(i,stocks){
+                stocks[i].setHistory(stocks[i].getTicker(), sector.name).then(function(result, error){
+                    if(i<stocks.length-1){
+                        i++;
+                        recurs(i,stocks);
+                        console.log(i, stocks.length);
+                    }
+                    if (i == stocks.length-1){
+                        resolve();
+                    }
+                })
+            };
+            historyMonth.findOne().then(function(tick){
+                tick.update = new Date();
+                recurs(0, stocks);
+                tick.save();
             });
         });
-    });
+        historyPromise.then(function(reslt, err){
+            j++;
+            recurs2(j);
+        })
+    }
+    
     res.redirect('/settings');
 }
+
 
 //увеличить число возвращаемых значений для подсчета статистики
 function check_signals(args, history, month){

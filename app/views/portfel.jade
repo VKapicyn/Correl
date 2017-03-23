@@ -1,4 +1,37 @@
 html
+    head
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge')
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+
+        // Styles
+        link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css")
+        link(rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css")
+        link(href='/css/styles.css' rel="stylesheet" type="text/css")
+
+        //JS
+        script(src='/js/jquery-3.1.1.min.js')
+        script(src="//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js")
+        script(src='/js/front.js')
+        title
+            | Portfel
     body
-        h2
-            | #{select}
+        .container
+            .row
+                .col-md-3
+
+                    a(href='/show')
+                        button Показать портфель
+                .col-md-9
+                    table.table
+                        thead.thead-inverse
+                        tr
+                            th #
+                            th Название
+                            th Цена
+                            th Вероятность
+                            th Числ. исп.
+                            th вес
+                            th кф
+                        tbody(id='sTable')
+                                        tr

@@ -18,43 +18,30 @@ class stock{
         });
     }
 
-    //Переделать в связи с оптимизированной схемой данных
-    setHistory(ticker){
+    setHistory(ticker, sector){
         return new Promise((resolve, reject) => {
-            historyMonth.find().then(function(tickers){
-                console.log('zashel', tickers);
-                let j = 0;
-                if(tickers.length != 0){
-                    for(let i=0; i<tickers[0].ticker.length; i++){
-                        if(tickers[0].ticker[i].name == ticker){
-                            j++;
-                            downloadHistory().then(function(result, err){
-                                if (result == undefined || result == null)
-                                    reject(1);
-                                tickers[0].ticker[i].history = result;
-                            });
-                            break;
-                        }
-                    }
-                    if (j == 0){
-
-                    let tick = {};
-                    tick.name = ticker;
-                    downloadHistory(ticker).then(function(result, err){
-                        if (result == undefined || result == null)
-                            reject(1);
+            historyMonth.findOne().then(function(tickers){
+                downloadHistory(ticker).then(function(result, err){
+                    var _promise = tickers.save();
+                    if (result!=undefined){
+                        let tick = {};
+                        tick.name = ticker;
+                        tick.sector = sector;
                         tick.history = result;
-                        tickers[0].ticker.push(tick);
-                    });
-                    resolve(1);
+                        tickers.tickers.push(tick)
+                        tickers.good++;
+                        _promise.then(function(){
+                            resolve();
+                        })
                     }
-                    tickers[0].save();
-                }
-                else{
-                    let base = new historyMonth(); 
-                    base.save();
-                }
-            });
+                    else{
+                        tickers.bad++;
+                        _promise.then(function(){
+                            resolve();
+                        })
+                    }
+                });
+            })
         });
     }
 }
@@ -62,14 +49,22 @@ class stock{
 module.exports.stock = stock;
 
 var monthSchema = new mongoose.Schema({
-    name: String,
-    history: [{
-        Date: String, //mongoose.Schema.Types.Date,
-        Close: Number,
-        Open: Number,
-        High: Number,
-        Low: Number
-    }]
+    tickers: [{
+        name: String,
+        sector: String,
+        history: [{
+            Date: String, //mongoose.Schema.Types.Date,
+            Close: String,
+            Open: String,
+            High: String,
+            Low: String,
+            Volume: String,
+            Adj: String
+        }]
+    }],
+    update: String,
+    good: Number,
+    bad: Number
 })
 
 var historyMonth = mongoose.model('historyMonth', monthSchema);
@@ -77,26 +72,21 @@ module.exports.historyMonth = historyMonth;
 
 function downloadHistory(ticker){
     return new Promise((resolve, reject) => {
-        var url = 'http://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol='+ticker+'&apikey=8495';
+        var url = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20csv%20where%20url%3D%27http%3A%2F%2Fchart.finance.yahoo.com%2Ftable.csv%3Fs%3D'+ticker+'%26a%3D'+0+'%26b%3D'+01+'%26c%3D'+2010+'%26d%3D'+2+'%26e%3D'+22+'%26f%3D'+2017+'%26g%3Dm%26ignore%3D.csv%27%20and%20columns%3D%27Date%2COpen%2CHigh%2CLow%2CClose%2CVolume%2CAdj%27&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys';
         request({
             url: url,
             json: true
             }, function (error, response, body) {
                 if (!error && response.statusCode === 200) {
 
-                    let data = JSON.parse(JSON.stringify(body['Monthly Time Series']));
-                    let mass = [];
-                    let keys = Object.keys(data);
-                    keys.map(key => {
-                        let obj = {};
-                        obj.Date = key;
-                        obj.Close = data[key]['4. close'];
-                        obj.Open = data[key]['1. open'];
-                        obj.High = data[key]['2. high'];
-                        obj.Low = data[key]['3. low'];
-                        mass.push(obj);
-                    });
-                    resolve(mass);
+                    let data;
+                    try{
+                        data = JSON.parse(JSON.stringify(body['query']['results']['row']));
+                        resolve(data);
+                    }
+                    catch(e){
+                        resolve(undefined);
+                    }
                 }
             });     
         });

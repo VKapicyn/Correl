@@ -41,7 +41,7 @@ class sector{
 }
 
 exports.getSectors = function(){
-    return ['base_material','conglomerats','consumables','financial','health',
+    return ['conglomerats','base_material','consumables','financial','health',
     'industrial','services','technological','utility_bills','zones'];
 }
 

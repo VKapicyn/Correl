@@ -113,3 +113,5 @@ function getEndDate(){
 	var day = date.getDate()>=10?date.getDate():'0'+date.getdate();
 	return (date.getFullYear()+'-'+month+'-'+day);
 };
+
+module.exports.getEndDate = getEndDate;
