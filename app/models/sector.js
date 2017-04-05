@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+let historyMonth = require('../models/stock').historyMonth;
 
 class sector{
     constructor(name){
@@ -20,12 +21,25 @@ class sector{
 
     }
 
+    getName(){
+        return this.name;
+    }
+
     getTable(){
         return new Promise((resolve, reject) => {
             tickersModel.findOne({sector: this.name}).then(function(result){
                 resolve(result);
             });
         })
+    }
+
+    getHistory(sector){
+        return new Promise((resolve, reject) => {
+            historyMonth.findOne({sector: sector}).then(function(result){
+                //console.log(result);
+                resolve(result.tickers);
+            });
+        });
     }
 
     getTickers(){

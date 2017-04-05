@@ -18,30 +18,19 @@ class stock{
         });
     }
 
-    setHistory(ticker, sector){
+    setHistory(ticker){
         return new Promise((resolve, reject) => {
-            historyMonth.findOne().then(function(tickers){
-                downloadHistory(ticker).then(function(result, err){
-                    var _promise = tickers.save();
-                    if (result!=undefined){
-                        let tick = {};
-                        tick.name = ticker;
-                        tick.sector = sector;
-                        tick.history = result;
-                        tickers.tickers.push(tick)
-                        tickers.good++;
-                        _promise.then(function(){
-                            resolve();
-                        })
-                    }
-                    else{
-                        tickers.bad++;
-                        _promise.then(function(){
-                            resolve();
-                        })
-                    }
-                });
-            })
+            downloadHistory(ticker).then(function(result, err){
+                if (result!=undefined){
+                    let tick = {};
+                    tick.name = ticker;
+                    tick.history = result;
+                    resolve(tick);
+                }
+                else{
+                    resolve('error');
+                }
+            });
         });
     }
 }
@@ -51,7 +40,6 @@ module.exports.stock = stock;
 var monthSchema = new mongoose.Schema({
     tickers: [{
         name: String,
-        sector: String,
         history: [{
             Date: String, //mongoose.Schema.Types.Date,
             Close: String,
@@ -62,6 +50,7 @@ var monthSchema = new mongoose.Schema({
             Adj: String
         }]
     }],
+    sector: String,
     update: String,
     good: Number,
     bad: Number

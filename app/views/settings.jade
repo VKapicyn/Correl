@@ -16,7 +16,16 @@ html
                         | Обновлено #{updated}%
                     a(href='/update')
                         button Обновить
-                    a(href='/select')
+                    br
+                    form(method='POST', action='/select')
+                        | #one
+                        input(type="checkbox", name="one") 
+                        | #two
+                        input(type="checkbox", name="two") 
+                        | #three
+                        input(type="checkbox", name="three") 
+                        | #four
+                        input(type="checkbox", name="four") 
                         button Отобрать акции
                     //a(href='/show')
                         //button Показать портфель
