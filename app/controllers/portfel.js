@@ -10,25 +10,30 @@ exports.selection = function(req, res){
     sectors_name.map(sector_name => sectors.push(new Sector(sector_name))) 
     //проход по секторам
     sectors.map(sector => {
-        let stocks = [];
+        let rows = [];
         //проход по акциям сектора
         sector.getHistory(sector.getName()).then(function(tickers, err){
+            console.log(sector.getName());
             tickers.map(ticker => {
-                console.log(sector.getName());
                 if (check_signals(req.body, ticker.history, 0).truth){
                     let stock_mark = [];
                     //проверяем всю историю и добавляем акцию в таблицу сектора
-                    for(let i=1; i<ticker.history.length; i++){
-                        let result = check_signals(req.params, ticker.history, i)
+                    for(let i=1; i<=ticker.history.length; i++){
+                        try{
+                        let result = check_signals(req.body, ticker.history, i)
                         if (result.truth)
                             stock_mark.push(result);
+                        }
+                        catch(e){
+                            continue;
+                        }
                     }
                     console.log(ticker.name);
                     let table_element = {};
                     table_element.ticker = ticker.name;
                     table_element.effect = 0;
                     table_element.count = stock_mark.length;
-                    table_element.price = ticker.history[1].Close;
+                    table_element.price = Math.round(ticker.history[1].Close*100)/100;
 
                     let good = 0, bad = 0;
                     stock_mark.map(mark => {
@@ -37,53 +42,18 @@ exports.selection = function(req, res){
                         else
                             bad++;
                     })
-                    table_elemnt.effect = (good/bad)*100;
-                    //добавляем подходящую акцию в сектор
-                    sector.setTable(table_element);
+                    table_element.effect = (table_element.count>0) ? (Math.round((good/table_element.count)*10000))/100 : 0;
+                    //добавляем подходящую акцию в таблицу сектор
+                    rows.push(table_element);
                 }
-                else
-                    console.log('888')
             })
-            /*let ok_stocks = [];
-            tickers.map(ticker => {
-                stocks.push(new Stock(ticker));
-            });
-            stocks.map(stock => {
-                console.log(stock)
-                //получаем историю для каждой акции
-                stock.getHistory().then(function(history, err){
-                    //проверка на прохождение условий последнего месяца
-                    if (check_signals(req.params, history, 0).truth){
-                        let stock_mark = [];
-                        //проверяем всю историю и добавляем акцию в таблицу сектора
-                        for(let i=1; i<history.length; i++){
-                            let result = check_signals(req.params, history, i)
-                            if (result.truth)
-                                stock_mark.push(result);
-                        }
-                        
-                        let table_element = {};
-                        table_element.ticker = stock.getTicker;
-                        table_element.effect = 0;
-                        table_element.count = stock_mark.length;
-                        table_element.price = history[0].Close;
-
-                        let good = 0, bad = 0;
-                        stock_mark.map(mark => {
-                            if (mark.diff > 0)
-                                good++;
-                            else
-                                bad++;
-                        })
-                        table_elemnt.effect = (good/bad)*100;
-                        //добавляем подходящую акцию в сектор
-                        setTable(table_element);
-                    }
-                });
-            });*/
+        }).then(function(){
+            sector.setTable(rows);
         });
+        
     });
-    res.render('portfel', sectors);
+    //res.render('portfel', sectors);
+    res.redirect('/settings');
 }
 
 exports.settings = function(req, res){
@@ -112,15 +82,24 @@ exports.settings = function(req, res){
                 });
 
             });
+            
             count_promise.then(function(all, err){
-                res.render('settings', {
-                lastUpdate: result.update,
-                count: all.good,
-                bad: all.bad,
-                procent: (all.good / all.count * 100).toFixed(2),
-                updated: ((all.good + all.bad) / all.count * 100).toFixed(2)
+                tickerModel.find().then(function(results){
+                    let selcount = 0;
+                    results.map(x => {
+                        selcount += x.table.length;
+                    })
+                    res.render('settings', {
+                    lastUpdate: result[0].update,
+                    count: all.good,
+                    bad: all.bad,
+                    procent: (all.good / all.count * 100).toFixed(2),
+                    updated: ((all.good + all.bad) / all.count * 100).toFixed(2),
+                    selectorCount: selcount
+                    });
                 });
             });
+            
 
         }
         else
@@ -208,7 +187,7 @@ function check_signals(args, history, month){
 //ошибка в заполнении check при проверки сигнала
     if (args.one == 'on'){
         i++;
-        if (signals.one(history, month))
+        if (signals.one(history, month)==true)
             check.push(true);
         else
             check.push(false);
@@ -229,19 +208,25 @@ function check_signals(args, history, month){
     }
     if (args.four == 'on'){
         i++;
-        if (signals.for(history, month))
+        if (signals.four(history, month))
             check.push(true);
         else
             check.push(false);
     }
 
     let j=0;
-    check.map(x => j = (x == true) ? j++ : j)
-        console.log(i, check, check.length);
-    //ПЕРЕДЕЛАТЬ!!!
+
+    check.map(x => {
+        if (x == true)
+            j++;
+    })
+
     //если все отмеченные условия выполнены
     result.truth = ((j == check.length) && (i == check.length)) ? true : false;
-    result.diff = history[month+1].Close - history[month].Close;
+    if (month>0)
+        result.diff = Number(history[month-1].Close) - Number(history[month].Close);
+    else
+        result.diff = 0;
 
     return result;
 }

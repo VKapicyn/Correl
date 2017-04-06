@@ -204,6 +204,6 @@ describe('#signalsTest', function(){
         assert.equal(0, ac(ticker, 0));
     })   
     it('Тест на EMA', function(){
-        assert.equal(0, ema(ticker, 2));
+        assert.equal(0, ema(ticker, 5));
     })    
 });

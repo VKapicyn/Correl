@@ -41,6 +41,8 @@ app.post('/select', require('./app/controllers/portfel').selection);
 app.get('/monitoring/:sort', require('./app/controllers/main').resultJson)
 app.get('/settings', require('./app/controllers/portfel').settings);
 app.get('/update', require('./app/controllers/portfel').update);
+app.get('/show', require('./app/controllers/show').getPortfel);
+app.get('/dataconfig', require('./app/controllers/show').portfelConfig)
 app.post('/result', require('./app/controllers/main').setConfig);
 app.post('/email', require('./app/controllers/main').setEmail);
 

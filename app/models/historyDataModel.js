@@ -81,6 +81,10 @@ function correl(one, two){
     return obj;
 }
 
+function cointegration(one, two){
+    
+}
+
 //загрузка конфига
 exports.getConfig = function(){
     let config = JSON.parse(fs.readFileSync('src/dataConfig.json', 'utf8'));

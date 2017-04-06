@@ -17,6 +17,10 @@ html
                     a(href='/update')
                         button Обновить
                     br
+                    hr
+                    h3
+                        | Отобрано в секторах: #{selectorCount}
+                    br
                     form(method='POST', action='/select')
                         | #one
                         input(type="checkbox", name="one") 
@@ -26,6 +30,9 @@ html
                         input(type="checkbox", name="three") 
                         | #four
                         input(type="checkbox", name="four") 
+                        br
                         button Отобрать акции
-                    //a(href='/show')
-                        //button Показать портфель
+                    br
+                    hr
+                    a(href='/show')
+                        button Показать портфель

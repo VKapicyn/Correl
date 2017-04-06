@@ -19,20 +19,81 @@ html
         .container
             .row
                 .col-md-3
-
-                    form(action='/show', method='GET')
-
-                        button Показать портфель
+                    h4 
+                        | Текущие ограничения:
+                    b
+                        | Цена
+                        br
+                        | Число исп.
+                        br
+                        | Вероятность
+                    br
+                    hr
+                    form(method='GET', action='/dataconfig')
+                        input(type='text', placeholder='Цена')
+                        input(type='text', placeholder='Число исп.')
+                        input(type='text', placeholder='Вероятность')
+                        br
+                        button Сохранить
                 .col-md-9
                     table.table
                         thead.thead-inverse
-                        tr
-                            th #
-                            th Название
-                            th Цена
-                            th Вероятность
-                            th Числ. исп.
-                            th вес
-                            th кф
-                        tbody(id='sTable')
+                            tr
+                                th #
+                                th Сектор
+                                th Название
+                                th Цена
+                                th Вероятность
+                                th Числ. исп.
+                            tbody
+                            tr
+                                -for(var i=0; i<sort.length; i++)
+                                    td
+                                        | #{i}
+                                    td
+                                        | #{sort[i].sector}
+                                    td    
+                                        | #{sort[i].ticker}
+                                    td
+                                        | #{sort[i].price}
+                                    td
+                                        | #{sort[i].effect}
+                                    td
+                                        | #{sort[i].count}
+                                    tr
+                    button Добавить в индекс
+                .col-md-12
+                    hr
+                    - for(var i=0; i<sectors.length; i++)
+                        details
+                            summary
+                                | #{sectors[i].sector} (#{sectors[i].table.length})
+                            table.table
+                                thead.thead-inverse
+                                tr
+                                    th #
+                                    th Название
+                                    th Цена
+                                    th Вероятность
+                                    th Числ. исп.
+                                tbody(id='sTable')
+                                tr
+                                    -for(var j=0; j<sectors[i].table.length; j++)
+                                        td
+                                            | #{j}
+                                        td
+                                            | #{sectors[i].table[j].ticker}
+                                        td
+                                            | #{sectors[i].table[j].price}
+                                        td
+                                            | #{sectors[i].table[j].effect}
+                                        td
+                                            | #{sectors[i].table[j].count}
                                         tr
+                    hr
+                .col-md-3
+                    h4
+                        | Тут история индекса
+                .col-md-9
+                    h4
+                        | Тут будет график

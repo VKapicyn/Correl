@@ -9,14 +9,8 @@ class sector{
     setTable(object){
         //this.table.push(object);
         tickersModel.find({sector: this.name}).then(function(result){
-            if (result.length == 0)
-            {
-                let row = new tickerSchema();
-                row.table.push(object);
-                row.save();
-            } 
-            else
-                result[0].table.push(object);
+                result[0].table = object;
+                result[0].save();     
         })
 
     }
