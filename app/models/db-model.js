@@ -54,7 +54,3 @@ var historySchema = new mongoose.Schema({
 
 var historyModel = mongoose.model('histories', historySchema);
 module.exports.historyModel = historyModel;
-
-var portfelSchema = new mongoose.Schema({
-    
-})

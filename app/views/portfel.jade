@@ -13,6 +13,10 @@ html
         script(src='/js/jquery-3.1.1.min.js')
         script(src="//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js")
         script(src='/js/front.js')
+        script(src='https://code.jquery.com/jquery-3.1.1.min.js')
+        script(src='https://code.highcharts.com/stock/highstock.js')
+        script(src='https://code.highcharts.com/stock/modules/exporting.js')
+        script(src='/js/graph.js')
         title
             | Portfel
     body
@@ -20,48 +24,49 @@ html
             .row
                 .col-md-3
                     h4 
-                        | Текущие ограничения:
+                        | Текущие ограничения: 
                     b
-                        | Цена
+                        | Цена: #{config.price}
                         br
-                        | Число исп.
+                        | Число исп.: #{config.count}
                         br
-                        | Вероятность
+                        | Вероятность: #{config.effect}
                     br
                     hr
-                    form(method='GET', action='/dataconfig')
-                        input(type='text', placeholder='Цена')
-                        input(type='text', placeholder='Число исп.')
-                        input(type='text', placeholder='Вероятность')
+                    form(method='POST', action='/dataconfig')
+                        input(type='text', name='price', placeholder='Цена')
+                        input(type='text', name='count', placeholder='Число исп.')
+                        input(type='text', name='effect', placeholder='Вероятность')
                         br
                         button Сохранить
                 .col-md-9
-                    table.table
-                        thead.thead-inverse
-                            tr
-                                th #
-                                th Сектор
-                                th Название
-                                th Цена
-                                th Вероятность
-                                th Числ. исп.
-                            tbody
-                            tr
-                                -for(var i=0; i<sort.length; i++)
-                                    td
-                                        | #{i}
-                                    td
-                                        | #{sort[i].sector}
-                                    td    
-                                        | #{sort[i].ticker}
-                                    td
-                                        | #{sort[i].price}
-                                    td
-                                        | #{sort[i].effect}
-                                    td
-                                        | #{sort[i].count}
-                                    tr
-                    button Добавить в индекс
+                    form(method='POST', action='/addInIndex')
+                        table.table
+                            thead.thead-inverse
+                                tr
+                                    th #
+                                    th Сектор
+                                    th Название
+                                    th Цена
+                                    th Вероятность
+                                    th Числ. исп.
+                                tbody
+                                tr
+                                    -for(var i=0; i<sort.length; i++)
+                                        td
+                                            input(type='checkbox', name='tickers',value='#{sort[i].ticker};#{sort[i].price}')
+                                        td
+                                            | #{sort[i].sector}
+                                        td    
+                                            | #{sort[i].ticker}
+                                        td
+                                            | #{sort[i].price}
+                                        td
+                                            | #{sort[i].effect}
+                                        td
+                                            | #{sort[i].count}
+                                        tr
+                        button Добавить в индекс
                 .col-md-12
                     hr
                     - for(var i=0; i<sectors.length; i++)
@@ -93,7 +98,7 @@ html
                     hr
                 .col-md-3
                     h4
-                        | Тут история индекса
+                        | Тут будут настройки и история индекса
                 .col-md-9
                     h4
-                        | Тут будет график
+                    #graph(style='height:400px; min-width:310px')

@@ -28,8 +28,8 @@ exports.getPortfel = function(req, res){
             resolve(sort);
         })
         prom.then(function(sort, err){
-            console.log(sort);
-            res.render('portfel',{sectors: result, sort: sort})
+            //console.log(sort);
+            res.render('portfel',{sectors: result, sort: sort, config: config})
         })
         
     })
@@ -41,5 +41,22 @@ exports.getGraph = function(){
 }
 
 exports.portfelConfig = function(req, res){
-    //как в main.js setConfig
+    try{
+        let someData = {
+            "price": req.body.price,
+            "effect": req.body.effect,
+            "count": req.body.count
+        };
+        let data = JSON.parse(fs.readFileSync('src/portfelConfig.json', 'utf8'));
+        data.price = (someData.price == '') ? data.price : someData.price;
+        data.effect = (someData.effect == '') ? data.effect : someData.effect;
+        data.count = (someData.count == '') ? data.count : someData.count;
+
+        let dataJson = JSON.stringify(data);
+        fs.writeFile('src/portfelConfig.json', dataJson);
+        res.send('сохранил</br><a href="/show">вернуться</a>')
+    }
+    catch(e){
+        console.log(e); res.send('Неверные входные данные');
+    }
 }

@@ -61,7 +61,7 @@ module.exports.historyMonth = historyMonth;
 
 function downloadHistory(ticker){
     return new Promise((resolve, reject) => {
-        var url = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20csv%20where%20url%3D%27http%3A%2F%2Fchart.finance.yahoo.com%2Ftable.csv%3Fs%3D'+ticker+'%26a%3D'+0+'%26b%3D'+01+'%26c%3D'+2010+'%26d%3D'+2+'%26e%3D'+22+'%26f%3D'+2017+'%26g%3Dm%26ignore%3D.csv%27%20and%20columns%3D%27Date%2COpen%2CHigh%2CLow%2CClose%2CVolume%2CAdj%27&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys';
+        var url = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20csv%20where%20url%3D%27http%3A%2F%2Fchart.finance.yahoo.com%2Ftable.csv%3Fs%3D'+ticker+'%26a%3D'+0+'%26b%3D'+01+'%26c%3D'+2010+'%26d%3D'+2+'%26e%3D'+22+'%26f%3D'+2020+'%26g%3Dm%26ignore%3D.csv%27%20and%20columns%3D%27Date%2COpen%2CHigh%2CLow%2CClose%2CVolume%2CAdj%27&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys';
         request({
             url: url,
             json: true

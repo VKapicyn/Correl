@@ -42,9 +42,10 @@ app.get('/monitoring/:sort', require('./app/controllers/main').resultJson)
 app.get('/settings', require('./app/controllers/portfel').settings);
 app.get('/update', require('./app/controllers/portfel').update);
 app.get('/show', require('./app/controllers/show').getPortfel);
-app.get('/dataconfig', require('./app/controllers/show').portfelConfig)
+app.post('/dataconfig', require('./app/controllers/show').portfelConfig)
 app.post('/result', require('./app/controllers/main').setConfig);
 app.post('/email', require('./app/controllers/main').setEmail);
+app.post('/addInIndex', require('./app/models/index').addInIndex);
 
 app.get('/test', function(req, res){
   require('./app/models/stock').historyMonth.findOne({sector:'conglomerats'}).then(function(result){

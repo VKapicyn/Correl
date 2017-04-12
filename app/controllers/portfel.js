@@ -7,6 +7,9 @@ var signals = require('../models/signals');
 
 exports.selection = function(req, res){
     let sectors = [];
+    let dop;
+        dop = (req.body.closer == 'on') ? 1: 0;
+        console.log(dop);
     sectors_name.map(sector_name => sectors.push(new Sector(sector_name))) 
     //проход по секторам
     sectors.map(sector => {
@@ -15,10 +18,10 @@ exports.selection = function(req, res){
         sector.getHistory(sector.getName()).then(function(tickers, err){
             console.log(sector.getName());
             tickers.map(ticker => {
-                if (check_signals(req.body, ticker.history, 0).truth){
+                if (check_signals(req.body, ticker.history, dop).truth){
                     let stock_mark = [];
                     //проверяем всю историю и добавляем акцию в таблицу сектора
-                    for(let i=1; i<=ticker.history.length; i++){
+                    for(let i=1+dop; i<=ticker.history.length; i++){
                         try{
                         let result = check_signals(req.body, ticker.history, i)
                         if (result.truth)
@@ -33,7 +36,7 @@ exports.selection = function(req, res){
                     table_element.ticker = ticker.name;
                     table_element.effect = 0;
                     table_element.count = stock_mark.length;
-                    table_element.price = Math.round(ticker.history[1].Close*100)/100;
+                    table_element.price = Math.round(ticker.history[1+dop].Close*100)/100;
 
                     let good = 0, bad = 0;
                     stock_mark.map(mark => {
